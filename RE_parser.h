@@ -25,8 +25,8 @@ void node_add_child(Node * const p_node, Node * const p_child);
 
 void node_free(Node * p_node);
 
-// Backtraking: release the last n childs added by a failure branch.
-void node_free_last_childs(Node * const p_node, int n);
+// Backtraking: release the last child added by a failure branch.
+void node_free_last_child(Node * const p_node);
 
 void node_free_childs(Node * const p_node);
 

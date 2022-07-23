@@ -66,8 +66,8 @@ void node_free (Node * p_node)
   }
 }
 
-// Backtraking: release the last n childs added by n failure branches.
-void node_free_last_childs (Node * const p_node, int n)
+// Backtraking: release the last child added by a failure branch.
+void node_free_last_child (Node * const p_node)
 {
   for (int i = MAX_CHILDS-1; i >= 0; --i)
   {
@@ -75,10 +75,8 @@ void node_free_last_childs (Node * const p_node, int n)
     {
       node_free(p_node->childs[i]);
       p_node->childs[i] = NULL;
-      --n;
-    }
-    if (n == 0)
       return;
+    }
   }
 }
 
@@ -245,54 +243,46 @@ bool RE_prime (const char *reg_expr,
 
   // RE' -> + RE RE'
   if (plus(reg_expr, p_idx_in, &idx_tmp1, p_RE_prime))
-  {
     if (RE(reg_expr, &idx_tmp1, &idx_tmp2, p_RE_prime))
-    {
       if(RE_prime(reg_expr, &idx_tmp2, p_idx_out, p_RE_prime))
         return true;
-      else
-        node_free_last_childs(p_RE_prime, 2);
-    }
-    else
-      node_free_last_childs(p_RE_prime, 1);
-  }
+
+
+  node_free_childs(p_RE_prime);
 
   // RE' -> + RE.
   if (plus(reg_expr, p_idx_in, &idx_tmp1, p_RE_prime))
-  {
     if (RE(reg_expr, &idx_tmp1, p_idx_out, p_RE_prime))
       return true;
-    else
-      node_free_last_childs(p_RE_prime, 1);
-  }
+
+  node_free_childs(p_RE_prime);
 
   // RE' -> * RE'.
   if (star(reg_expr, p_idx_in, &idx_tmp1, p_RE_prime))
-  {
     if (RE_prime(reg_expr, &idx_tmp1, p_idx_out, p_RE_prime))
-      return true;
-    else
-      node_free_last_childs(p_RE_prime, 1);
-  }
+
+  node_free_childs(p_RE_prime);
 
   // RE' -> RE RE'.
   if (RE(reg_expr, p_idx_in, &idx_tmp1, p_RE_prime))
-  {
     if (RE_prime(reg_expr, &idx_tmp1, p_idx_out, p_RE_prime))
       return true;
-    else
-      node_free_last_childs(p_RE_prime, 1);
-  }
+
+
+  node_free_childs(p_RE_prime);
 
   // RE' -> RE.
   if (RE(reg_expr, p_idx_in, p_idx_out, p_RE_prime))
     return true;
 
+  node_free_childs(p_RE_prime);
+
   // RE' -> *.
   if (star(reg_expr, p_idx_in, p_idx_out, p_RE_prime))
     return true;
 
-  node_free_last_childs(p_node, 1); // Free `p_RE_prime' and all of its childs.
+  node_free_childs(p_RE_prime);
+  node_free_last_child(p_node);  // This is a failure branch, remove the node.
   return false;
 }
 
@@ -310,64 +300,48 @@ bool RE (const char *reg_expr,
 
   // RE -> # RE'.
   if (epsilon(reg_expr, p_idx_in, &idx_tmp1, p_RE))
-  {
     if (RE_prime(reg_expr, &idx_tmp1, p_idx_out, p_RE))
       return true;
-    else
-      node_free_last_childs(p_RE, 1);
-  }
+
+  node_free_childs(p_RE);
 
   // RE -> symbol RE'.
   if (symbol(reg_expr, p_idx_in, &idx_tmp1, p_RE))
-  {
     if (RE_prime(reg_expr, &idx_tmp1, p_idx_out, p_RE))
       return true;
-    else
-      node_free_last_childs(p_RE, 1);
-  }
+
+
+  node_free_childs(p_RE);
 
   // RE -> ( RE ) RE'.
   if (lpar(reg_expr, p_idx_in, &idx_tmp1, p_RE))
-  {
     if (RE(reg_expr, &idx_tmp1, &idx_tmp2, p_RE))
-    {
       if (rpar(reg_expr, &idx_tmp2, &idx_tmp3, p_RE))
-      {
         if (RE_prime(reg_expr, &idx_tmp3, p_idx_out, p_RE))
           return true;
-        else
-          node_free_last_childs(p_RE, 3);
-      }
-      else
-        node_free_last_childs(p_RE, 2);
-    }
-    else
-      node_free_last_childs(p_RE, 1);
-  }
+
+  node_free_childs(p_RE);
 
   // RE -> ( RE ).
   if (lpar(reg_expr, p_idx_in, &idx_tmp1, p_RE))
-  {
     if (RE(reg_expr, &idx_tmp1, &idx_tmp2, p_RE))
-    {
       if (rpar(reg_expr, &idx_tmp2, p_idx_out, p_RE))
         return true;
-      else
-        node_free_last_childs(p_RE, 2);
-    }
-    else
-      node_free_last_childs(p_RE, 1);
-  }
+
+  node_free_childs(p_RE);
 
   // RE -> #.
   if (epsilon(reg_expr, p_idx_in, p_idx_out, p_RE))
     return true;
 
+  node_free_childs(p_RE);
+
   // RE -> symbol.
   if (symbol(reg_expr, p_idx_in, p_idx_out, p_RE))
     return true;
 
-  node_free_last_childs(p_node, 1); // Free `p_RE' and all of its childs.
+  node_free_childs(p_RE);
+  node_free_last_child(p_node); // This is a failure branch, remove the node.
   return false;
 }
 
