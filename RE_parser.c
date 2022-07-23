@@ -247,7 +247,6 @@ bool RE_prime (const char *reg_expr,
       if(RE_prime(reg_expr, &idx_tmp2, p_idx_out, p_RE_prime))
         return true;
 
-
   node_free_childs(p_RE_prime);
 
   // RE' -> + RE.
@@ -268,7 +267,6 @@ bool RE_prime (const char *reg_expr,
     if (RE_prime(reg_expr, &idx_tmp1, p_idx_out, p_RE_prime))
       return true;
 
-
   node_free_childs(p_RE_prime);
 
   // RE' -> RE.
@@ -281,8 +279,7 @@ bool RE_prime (const char *reg_expr,
   if (star(reg_expr, p_idx_in, p_idx_out, p_RE_prime))
     return true;
 
-  node_free_childs(p_RE_prime);
-  node_free_last_child(p_node);  // This is a failure branch, remove the node.
+  node_free_last_child(p_node);  // This is a failure branch, remove it.
   return false;
 }
 
@@ -340,8 +337,7 @@ bool RE (const char *reg_expr,
   if (symbol(reg_expr, p_idx_in, p_idx_out, p_RE))
     return true;
 
-  node_free_childs(p_RE);
-  node_free_last_child(p_node); // This is a failure branch, remove the node.
+  node_free_last_child(p_node); // This is a failure branch, remove it.
   return false;
 }
 
