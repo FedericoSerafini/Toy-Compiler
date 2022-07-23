@@ -259,6 +259,7 @@ bool RE_prime (const char *reg_expr,
   // RE' -> * RE'.
   if (star(reg_expr, p_idx_in, &idx_tmp1, p_RE_prime))
     if (RE_prime(reg_expr, &idx_tmp1, p_idx_out, p_RE_prime))
+      return true;
 
   node_free_childs(p_RE_prime);
 
@@ -307,7 +308,6 @@ bool RE (const char *reg_expr,
     if (RE_prime(reg_expr, &idx_tmp1, p_idx_out, p_RE))
       return true;
 
-
   node_free_childs(p_RE);
 
   // RE -> ( RE ) RE'.
@@ -347,9 +347,21 @@ bool parse (const char *reg_expr, Node *p_node)
   int end_index = 0;
 
   node_init(p_node, "Root");
-  bool parse_result = RE(reg_expr, &start_index , &end_index, p_node);
 
-  return (parse_result && reg_expr[end_index] == '\0');
+  if (RE(reg_expr, &start_index , &end_index, p_node))
+  {
+    if ('\0' != reg_expr[end_index])
+      printf("Parser is not working properly: input characters left\n");
+    else
+      return true;
+  }
+  else
+  {
+    printf("Unexpected character '%c' in position %d\n",
+           reg_expr[end_index], end_index);
+  }
+
+  return false;
 }
 
 int main (int argc, char **argv)
