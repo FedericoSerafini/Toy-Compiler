@@ -17,14 +17,14 @@
 #include <string.h>
 #include <stdlib.h>
 
-#define MAX_content_LEN 16
+#define MAX_CONTENT_LEN 16 // Max characters of the content of a node.
 #define MAX_CHILDS 4 // Max number of childs for a variable in the parse tree.
-#define INDENTATION 1
+#define INDENTATION 1 // Child indentation when the parse tree is printed.
 
 /**** Parse tree functions and data structures. ****/
 struct Node
 {
-  char content   [MAX_content_LEN];
+  char content   [MAX_CONTENT_LEN];
   Node * childs [MAX_CHILDS];
 };
 
@@ -66,7 +66,7 @@ void node_free (Node * p_node)
   }
 }
 
-// Backtraking: release the last n childs added by a failure branch.
+// Backtraking: release the last n childs added by n failure branches.
 void node_free_last_childs (Node * const p_node, int n)
 {
   for (int i = MAX_CHILDS-1; i >= 0; --i)
@@ -133,6 +133,7 @@ bool symbol (const char *reg_expr,
              Node * const p_node)
 {
   const int i = *p_idx_in;
+
   if (   (reg_expr[i] == '_')
       || (48 <= reg_expr[i] && reg_expr[i] <= 57)   // Digits.
       || (65 <= reg_expr[i] && reg_expr[i] <= 90)   // Caps letters.
@@ -157,6 +158,7 @@ bool lpar (const char *reg_expr,
            Node * const p_node)
 {
   const int i = *p_idx_in;
+
   if (40 == reg_expr[i])
   {
     *p_idx_out = i + 1;
@@ -175,6 +177,7 @@ bool rpar (const char *reg_expr,
            Node * const p_node)
 {
   const int i = *p_idx_in;
+
   if (41 == reg_expr[i])
   {
     *p_idx_out = i + 1;
@@ -193,6 +196,7 @@ bool star (const char *reg_expr,
            Node * const p_node)
 {
   const int i = *p_idx_in;
+
   if (42 == reg_expr[i])
   {
     *p_idx_out = i + 1;
@@ -211,6 +215,7 @@ bool plus (const char *reg_expr,
            Node * const p_node)
 {
   const int i = *p_idx_in;
+
   if (43 == reg_expr[i])
   {
     *p_idx_out = i + 1;
@@ -287,7 +292,7 @@ bool RE_prime (const char *reg_expr,
   if (star(reg_expr, p_idx_in, p_idx_out, p_RE_prime))
     return true;
 
-  node_free_last_childs(p_node, 1);
+  node_free_last_childs(p_node, 1); // Free `p_RE_prime' and all of its childs.
   return false;
 }
 
@@ -362,7 +367,7 @@ bool RE (const char *reg_expr,
   if (symbol(reg_expr, p_idx_in, p_idx_out, p_RE))
     return true;
 
-  node_free_last_childs(p_node, 1);
+  node_free_last_childs(p_node, 1); // Free `p_RE' and all of its childs.
   return false;
 }
 
@@ -371,7 +376,7 @@ bool parse (const char *reg_expr, Node *p_node)
   int start_index = 0;
   int end_index = 0;
 
-  node_init(p_node, "Parse tree:");
+  node_init(p_node, "Root");
   bool parse_result = RE(reg_expr, &start_index , &end_index, p_node);
 
   return (parse_result && reg_expr[end_index] == '\0');
@@ -382,7 +387,7 @@ int main (int argc, char **argv)
   // Input checks.
   if (argc != 2)
   {
-    printf("Wrong number of input arguments: ");
+    printf("Wrong number of command-line arguments: ");
     printf("%d arguments found, %d expected\n", argc -1, 1);
     return 1;
   }
@@ -391,8 +396,7 @@ int main (int argc, char **argv)
 
   if (parse(argv[1], &tree))
   {
-    printf("Parsing completed successfully\n");
-    tree_print(&tree, 0);
+    tree_print(tree.childs[0], 0); // Do not print the "root" node.
   }
   else
   {
