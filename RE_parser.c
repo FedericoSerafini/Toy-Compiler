@@ -2,7 +2,7 @@
  *  A recursive-descent parser for a regular expression subset, (the empty
  *  language is not included).
  *
- *  Regular Expression grammar ('#' is the empty content):
+ *  Regular Expression grammar ('#' is the empty string):
  *  RE  ::= # | symbol | RE + RE | RE RE | RE * | ( RE ).
  *
  *  Left recursion removal:
