@@ -12,7 +12,6 @@
 
 #include "RE_parser.h"
 
-#include <stdio.h>
 #include <stddef.h>
 #include <string.h>
 #include <stdlib.h>
@@ -101,6 +100,23 @@ void tree_print (const Node * const p_node, int indent)
     for (int i = 0; i < MAX_CHILDS; ++i)
     {
       tree_print(p_node->childs[i], indent + INDENTATION);
+    }
+  }
+}
+
+void tree_save (Node *p_node, FILE *fp, int indent)
+{
+  if (NULL != p_node)
+  {
+    for (int i = 0; i < indent; ++i)
+    {
+      fputs("-", fp);
+    }
+    fputs(p_node->content, fp);
+    fputs("\n", fp);
+    for (int i = 0; i < MAX_CHILDS; ++i)
+    {
+      tree_save(p_node->childs[i], fp, indent + INDENTATION);
     }
   }
 }
@@ -379,6 +395,17 @@ int main (int argc, char **argv)
   if (parse(argv[1], &tree))
   {
     tree_print(tree.childs[0], 0); // Do not print the "root" node.
+
+    FILE *fp = fopen("RE_parse_tree.txt", "w");
+    if (NULL != fp)
+    {
+      tree_save(tree.childs[0], fp, 0);
+      fclose(fp);
+    }
+    else
+    {
+      printf("Cannot create file\n");
+    }
   }
   else
   {

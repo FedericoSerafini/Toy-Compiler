@@ -12,6 +12,7 @@
 #pragma once
 
 #include <stdbool.h>
+#include <stdio.h>
 
 /**** Parse tree functions and data structures. ****/
 
@@ -31,6 +32,8 @@ void node_free_last_child(Node * const p_node);
 void node_free_childs(Node * const p_node);
 
 void tree_print (const Node * const p_node, int indent);
+
+void tree_save (Node *p_node, FILE *fp, int indent);
 
 /**** Terminals. ****/
 
