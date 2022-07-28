@@ -7,5 +7,4 @@ RE_parser: $(SOURCES)
 	gcc -Wall -Wextra -O0 -g -fsanitize=address $(SOURCES) -o RE_parser
 
 clean :
-	rm -f RE_parser
-
+	rm -f RE_parser RE_parse_tree.txt
