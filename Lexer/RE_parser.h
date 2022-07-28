@@ -26,14 +26,13 @@ void node_add_child(Node * const p_node, Node * const p_child);
 
 void node_free(Node * p_node);
 
-// Backtraking: release the last child added by a failure branch.
 void node_free_last_child(Node * const p_node);
 
 void node_free_childs(Node * const p_node);
 
-void tree_print (const Node * const p_node, int indent);
+void node_print (const Node * const p_node, int indent);
 
-void tree_save (Node *p_node, FILE *fp, int indent);
+void node_save (Node *p_node, FILE *fp, int indent);
 
 /**** Terminals. ****/
 

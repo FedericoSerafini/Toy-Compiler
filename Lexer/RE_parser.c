@@ -65,7 +65,6 @@ void node_free (Node * p_node)
   }
 }
 
-// Backtraking: release the last child added by a failure branch.
 void node_free_last_child (Node * const p_node)
 {
   for (int i = MAX_CHILDS-1; i >= 0; --i)
@@ -88,7 +87,7 @@ void node_free_childs (Node * const p_node)
   }
 }
 
-void tree_print (const Node * const p_node, int indent)
+void node_print (const Node * const p_node, int indent)
 {
   if (NULL != p_node)
   {
@@ -99,12 +98,12 @@ void tree_print (const Node * const p_node, int indent)
     printf("%s\n", p_node->content);
     for (int i = 0; i < MAX_CHILDS; ++i)
     {
-      tree_print(p_node->childs[i], indent + INDENTATION);
+      node_print(p_node->childs[i], indent + INDENTATION);
     }
   }
 }
 
-void tree_save (Node *p_node, FILE *fp, int indent)
+void node_save (Node *p_node, FILE *fp, int indent)
 {
   if (NULL != p_node)
   {
@@ -116,7 +115,7 @@ void tree_save (Node *p_node, FILE *fp, int indent)
     fputs("\n", fp);
     for (int i = 0; i < MAX_CHILDS; ++i)
     {
-      tree_save(p_node->childs[i], fp, indent + INDENTATION);
+      node_save(p_node->childs[i], fp, indent + INDENTATION);
     }
   }
 }
@@ -394,12 +393,12 @@ int main (int argc, char **argv)
 
   if (parse(argv[1], &tree))
   {
-    tree_print(tree.childs[0], 0); // Do not print the "root" node.
+    node_print(tree.childs[0], 0);
 
     FILE *fp = fopen("RE_parse_tree.txt", "w");
     if (NULL != fp)
     {
-      tree_save(tree.childs[0], fp, 0);
+      node_save(tree.childs[0], fp, 0);
       fclose(fp);
     }
     else
