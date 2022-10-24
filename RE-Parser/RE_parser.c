@@ -17,14 +17,14 @@
 #include <stdlib.h>
 
 #define MAX_CONTENT_LEN 16 // Max characters of the content of a node.
-#define MAX_CHILDS 4 // Max number of childs for a variable in the parse tree.
+#define MAX_CHILDREN 4 // Max number of children for a variable in the parse tree.
 #define INDENTATION 1 // Child indentation when the parse tree is printed.
 
 /**** Parse tree functions and data structures. ****/
 struct Node
 {
   char content   [MAX_CONTENT_LEN];
-  Node * childs [MAX_CHILDS];
+  Node * children [MAX_CHILDREN];
 };
 
 Node * node_new (void)
@@ -34,19 +34,19 @@ Node * node_new (void)
 
 void node_init (Node * const p_node, const char * s)
 {
-  for (int i = 0; i < MAX_CHILDS; ++i)
-    p_node->childs[i] = NULL;
+  for (int i = 0; i < MAX_CHILDREN; ++i)
+    p_node->children[i] = NULL;
 
   strcpy(p_node->content, s);
 }
 
 void node_add_child (Node * const p_node, Node * const p_child)
 {
-  for (int i = 0; i < MAX_CHILDS; ++i)
+  for (int i = 0; i < MAX_CHILDREN; ++i)
   {
-    if (p_node->childs[i] == NULL)
+    if (p_node->children[i] == NULL)
     {
-      p_node->childs[i] = p_child;
+      p_node->children[i] = p_child;
       break;
     }
   }
@@ -56,10 +56,10 @@ void node_free (Node * p_node)
 {
   if (NULL != p_node)
   {
-    for (int i = 0; i < MAX_CHILDS; ++i)
+    for (int i = 0; i < MAX_CHILDREN; ++i)
     {
-      node_free(p_node->childs[i]);
-      p_node->childs[i] = NULL;
+      node_free(p_node->children[i]);
+      p_node->children[i] = NULL;
     }
     free(p_node);
   }
@@ -67,23 +67,23 @@ void node_free (Node * p_node)
 
 void node_free_last_child (Node * const p_node)
 {
-  for (int i = MAX_CHILDS-1; i >= 0; --i)
+  for (int i = MAX_CHILDREN-1; i >= 0; --i)
   {
-    if (p_node->childs[i] != NULL)
+    if (p_node->children[i] != NULL)
     {
-      node_free(p_node->childs[i]);
-      p_node->childs[i] = NULL;
+      node_free(p_node->children[i]);
+      p_node->children[i] = NULL;
       return;
     }
   }
 }
 
-void node_free_childs (Node * const p_node)
+void node_free_children (Node * const p_node)
 {
-  for (int i = 0; i < MAX_CHILDS; ++i)
+  for (int i = 0; i < MAX_CHILDREN; ++i)
   {
-    node_free(p_node->childs[i]);
-    p_node->childs[i] = NULL;
+    node_free(p_node->children[i]);
+    p_node->children[i] = NULL;
   }
 }
 
@@ -96,9 +96,9 @@ void node_print (const Node * const p_node, int indent)
       printf("-");
     }
     printf("%s\n", p_node->content);
-    for (int i = 0; i < MAX_CHILDS; ++i)
+    for (int i = 0; i < MAX_CHILDREN; ++i)
     {
-      node_print(p_node->childs[i], indent + INDENTATION);
+      node_print(p_node->children[i], indent + INDENTATION);
     }
   }
 }
@@ -113,9 +113,9 @@ void node_save (Node *p_node, FILE *fp, int indent)
     }
     fputs(p_node->content, fp);
     fputs("\n", fp);
-    for (int i = 0; i < MAX_CHILDS; ++i)
+    for (int i = 0; i < MAX_CHILDREN; ++i)
     {
-      node_save(p_node->childs[i], fp, indent + INDENTATION);
+      node_save(p_node->children[i], fp, indent + INDENTATION);
     }
   }
 }
@@ -262,34 +262,34 @@ bool RE_prime (const char *reg_expr,
       if(RE_prime(reg_expr, &idx_tmp2, p_idx_out, p_RE_prime))
         return true;
 
-  node_free_childs(p_RE_prime);
+  node_free_children(p_RE_prime);
 
   // RE' -> + RE.
   if (plus(reg_expr, p_idx_in, &idx_tmp1, p_RE_prime))
     if (RE(reg_expr, &idx_tmp1, p_idx_out, p_RE_prime))
       return true;
 
-  node_free_childs(p_RE_prime);
+  node_free_children(p_RE_prime);
 
   // RE' -> * RE'.
   if (star(reg_expr, p_idx_in, &idx_tmp1, p_RE_prime))
     if (RE_prime(reg_expr, &idx_tmp1, p_idx_out, p_RE_prime))
       return true;
 
-  node_free_childs(p_RE_prime);
+  node_free_children(p_RE_prime);
 
   // RE' -> RE RE'.
   if (RE(reg_expr, p_idx_in, &idx_tmp1, p_RE_prime))
     if (RE_prime(reg_expr, &idx_tmp1, p_idx_out, p_RE_prime))
       return true;
 
-  node_free_childs(p_RE_prime);
+  node_free_children(p_RE_prime);
 
   // RE' -> RE.
   if (RE(reg_expr, p_idx_in, p_idx_out, p_RE_prime))
     return true;
 
-  node_free_childs(p_RE_prime);
+  node_free_children(p_RE_prime);
 
   // RE' -> *.
   if (star(reg_expr, p_idx_in, p_idx_out, p_RE_prime))
@@ -316,14 +316,14 @@ bool RE (const char *reg_expr,
     if (RE_prime(reg_expr, &idx_tmp1, p_idx_out, p_RE))
       return true;
 
-  node_free_childs(p_RE);
+  node_free_children(p_RE);
 
   // RE -> symbol RE'.
   if (symbol(reg_expr, p_idx_in, &idx_tmp1, p_RE))
     if (RE_prime(reg_expr, &idx_tmp1, p_idx_out, p_RE))
       return true;
 
-  node_free_childs(p_RE);
+  node_free_children(p_RE);
 
   // RE -> ( RE ) RE'.
   if (lpar(reg_expr, p_idx_in, &idx_tmp1, p_RE))
@@ -332,7 +332,7 @@ bool RE (const char *reg_expr,
         if (RE_prime(reg_expr, &idx_tmp3, p_idx_out, p_RE))
           return true;
 
-  node_free_childs(p_RE);
+  node_free_children(p_RE);
 
   // RE -> ( RE ).
   if (lpar(reg_expr, p_idx_in, &idx_tmp1, p_RE))
@@ -340,13 +340,13 @@ bool RE (const char *reg_expr,
       if (rpar(reg_expr, &idx_tmp2, p_idx_out, p_RE))
         return true;
 
-  node_free_childs(p_RE);
+  node_free_children(p_RE);
 
   // RE -> #.
   if (epsilon(reg_expr, p_idx_in, p_idx_out, p_RE))
     return true;
 
-  node_free_childs(p_RE);
+  node_free_children(p_RE);
 
   // RE -> symbol.
   if (symbol(reg_expr, p_idx_in, p_idx_out, p_RE))
@@ -393,12 +393,12 @@ int main (int argc, char **argv)
 
   if (parse(argv[1], &tree))
   {
-    node_print(tree.childs[0], 0);
+    node_print(tree.children[0], 0);
 
     FILE *fp = fopen("RE_parse_tree.txt", "w");
     if (NULL != fp)
     {
-      node_save(tree.childs[0], fp, 0);
+      node_save(tree.children[0], fp, 0);
       fclose(fp);
     }
     else
@@ -411,7 +411,7 @@ int main (int argc, char **argv)
     printf("Syntax error\n");
   }
 
-  node_free_childs(&tree);
+  node_free_children(&tree);
 
   return 0;
 }

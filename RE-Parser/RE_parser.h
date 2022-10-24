@@ -28,7 +28,7 @@ void node_free(Node * p_node);
 
 void node_free_last_child(Node * const p_node);
 
-void node_free_childs(Node * const p_node);
+void node_free_children(Node * const p_node);
 
 void node_print (const Node * const p_node, int indent);
 
